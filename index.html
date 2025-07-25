@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -179,3 +180,186 @@
   </script>
 </body>
 </html>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Goalpara ESD Smart Postpaid Arrear</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: 'Roboto', Arial, sans-serif;
+      background: linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%);
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      background: white;
+      padding: 2rem 2.5rem;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(68,68,90,0.15);
+      max-width: 500px;
+      margin: 3rem auto;
+      position: relative;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+      font-weight: 700;
+      margin-bottom: 0.7em;
+    }
+    label {
+      font-weight: 500;
+      font-size: 1rem;
+      color: #234; 
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 13px;
+      font-size: 1.1rem;
+      border-radius: 8px;
+      border: 1px solid #adc7e2;
+      margin: 0.8em 0 1.3em 0;
+      box-sizing: border-box;
+      transition: border 0.23s;
+    }
+    input[type="text"]:focus {
+      outline: none;
+      border-color: #8067fd;
+      box-shadow: 0 2px 8px rgba(128,103,253,0.15);
+    }
+    button {
+      width: 100%;
+      padding: 14px 0;
+      background: linear-gradient(90deg, #8067fd 0%, #6fc1ff 100%);
+      color: white;
+      font-size: 1.08rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 0.2em;
+      box-shadow: 0 4px 12px rgba(128,103,253,0.07);
+      transition: background 0.23s;
+    }
+    button:hover {
+      background: linear-gradient(90deg, #6fc1ff 0%, #8067fd 100%);
+    }
+    .error {
+      color: #e74c3c;
+      text-align: center;
+      margin-top: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    .card {
+      margin: 1.5rem auto 1rem;
+      background: linear-gradient(100deg, #fdfbfb 0%, #ebedee 100%);
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(128,103,253,0.08);
+      overflow: hidden;
+      max-width: 430px;
+      animation: fadeIn 0.55s;
+    }
+    .card table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 1.07rem;
+      color: #35516f;
+    }
+    .card th {
+      background: #f0f4ff;
+      text-align: left;
+      padding: 9px 15px;
+      font-weight: 700;
+      width: 52%;
+      border-bottom: 1px solid #e0e6f0;
+    }
+    .card td {
+      background: #fff;
+      padding: 9px 15px;
+      border-bottom: 1px solid #e0e6f0;
+    }
+    .remamt {
+      color: #e53935;
+      font-weight: 700;
+      font-size: 1.12em;
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(18px);}
+      100% { opacity: 1; transform: none;}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Goalpara ESD Smart Postpaid Arrear</h1>
+    <label for="consumerNo">Enter Consumer Number (raw or partial):</label>
+    <input id="consumerNo" type="text" maxlength="40" placeholder="Paste a code, line, or raw value here..." autocomplete="off">
+    <button onclick="handleLookup()">Search</button>
+    <div id="errorMsg" class="error"></div>
+    <div id="consumerCard"></div>
+  </div>
+  <script>
+    let consumers = [];
+    fetch('consumers.json')
+      .then(response => response.json())
+      .then(data => { consumers = data; })
+      .catch(error => {
+        document.getElementById('errorMsg').textContent = "Unable to load data.";
+        console.error(error);
+      });
+
+    function convertToConsumerNo(raw) {
+      const clean = String(raw).replace(/\D/g, '');
+      if (!clean) return '';
+      if (clean.length >= 11) return clean.slice(-11);
+      const numeric = clean.slice(-5).padStart(5, '0');
+      const fifthFromRight = parseInt(numeric[0] || '0', 10);
+      const prefix = fifthFromRight >= 7 ? '400100' : '400000';
+      return prefix + numeric;
+    }
+
+    function handleLookup() {
+      document.getElementById('errorMsg').textContent = '';
+      document.getElementById('consumerCard').innerHTML = '';
+      let input = document.getElementById('consumerNo').value.trim();
+      if (!input) {
+        document.getElementById('errorMsg').textContent = "Please enter a Consumer No.";
+        return;
+      }
+      if (consumers.length === 0) {
+        document.getElementById('errorMsg').textContent = "Data loading, please wait…";
+        return;
+      }
+      let code = convertToConsumerNo(input);
+      let consumer = consumers.find(c => String(c["Consumer No"]) === code);
+      if (!consumer) {
+        document.getElementById('errorMsg').textContent = "No data found / No postpaid outstanding";
+        return;
+      }
+      document.getElementById('consumerCard').innerHTML = `
+        <div class="card">
+          <table>
+            <tr><th>Consumer No.</th><td>${consumer["Consumer No"]}</td></tr>
+            <tr><th>Name</th><td>${consumer["Consumer Name"]}</td></tr>
+            <tr><th>Address</th><td>${consumer["Consumer Address"]}</td></tr>
+            <tr><th>Freeze Amount</th><td>₹ ${consumer["FREEZE_AMT"]}</td></tr>
+            <tr><th>Remaining Amount (as on 21/07/2025)</th>
+                <td class="remamt">₹ ${consumer["REM_AMT"]}</td></tr>
+            <tr><th>Instalment No. OS</th><td>${consumer["INST_NO_OS"]}</td></tr>
+            <tr><th>Instalment Amt. OS</th><td>₹ ${consumer["INST_AMT_OS"]}</td></tr>
+          </table>
+        </div>
+      `;
+    }
+
+    document.getElementById('consumerNo').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') handleLookup();
+    });
+  </script>
+</body>
+</html>
+>>>>>>> 707a88018211ed8bad0e314099a6c3056d1b872c
