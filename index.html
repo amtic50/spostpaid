@@ -157,6 +157,22 @@
         document.getElementById('errorMsg').textContent = "No data found / No postpaid outstanding";
         return;
       }
+
+      // Dynamic calculation for today's date
+      const baseDate = new Date('2025-07-21'); // Base date from JSON (21/07/2025)
+      const today = new Date(); // Fetch today's date
+      const timeDiff = today - baseDate;
+      const daysPassed = Math.max(0, Math.floor(timeDiff / (1000 * 60 * 60 * 24))); // Days since base date (0 if before)
+
+      // Update values
+      const updatedInstNoOs = consumer.INST_NO_OS + daysPassed;
+      const deduction = daysPassed * consumer.INST_AMT_OS;
+      const updatedRemAmt = Math.max(0, consumer.REM_AMT - deduction).toFixed(2); // Prevent negative, round to 2 decimals
+
+      // Format today's date as DD/MM/YYYY
+      const todayFormatted = today.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+      // Display updated data
       document.getElementById('consumerCard').innerHTML = `
         <div class="card">
           <table>
@@ -164,9 +180,9 @@
             <tr><th>Name</th><td>${consumer["Consumer Name"]}</td></tr>
             <tr><th>Address</th><td>${consumer["Consumer Address"]}</td></tr>
             <tr><th>Freeze Amount</th><td>₹ ${consumer["FREEZE_AMT"]}</td></tr>
-            <tr><th>Remaining Amount (as on 21/07/2025)</th>
-                <td class="remamt">₹ ${consumer["REM_AMT"]}</td></tr>
-            <tr><th>Instalment No. OS</th><td>${consumer["INST_NO_OS"]}</td></tr>
+            <tr><th>Remaining Amount (as on ${todayFormatted})</th>
+                <td class="remamt">₹ ${updatedRemAmt}</td></tr>
+            <tr><th>Instalment No. OS</th><td>${updatedInstNoOs}</td></tr>
             <tr><th>Instalment Amt. OS</th><td>₹ ${consumer["INST_AMT_OS"]}</td></tr>
           </table>
         </div>
